@@ -1,9 +1,12 @@
 import socket
+from typing import Optional
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import Depends, HTTPException, status, APIRouter
+from pydantic import BaseModel
 
 
-# from app.service.auth import Auth
+from app.service.auth import Auth
+
 # from app.service import auth
 # from app.service.mailer import send_email_async
 from app.config.settings import get_settings
@@ -20,18 +23,22 @@ auth_router = APIRouter(
 )
 
 
+class User(BaseModel):
+    username: str
+    email: Optional[str] = None
+
+
 @auth_router.post("/login/")
 async def tes(login_data: OAuth2PasswordRequestForm = Depends()):
-    if login_data.username == "krzyzak":
-        return {"access_token": "access_token", "token_type": "bearer"}
-    else:
-        return {}
+
+    user = await Auth.authenticate_user(login_data.username, login_data.password)
+    print(user)
+    return {}
 
 
 @auth_router.post("/me")
-async def tes(login_data: OAuth2PasswordRequestForm = Depends()):
-    print(login_data)
-    return {"user": login_data}
+async def tes(current_user: User = Depends(Auth.get_current_active_user)):
+    return current_user
 
 
 # @auth_router.get("/login")

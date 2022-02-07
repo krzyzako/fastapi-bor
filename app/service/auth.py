@@ -1,6 +1,6 @@
 from datetime import timedelta
 import datetime
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import (
     OAuth2PasswordBearer,
     OAuth2PasswordRequestForm,
@@ -26,6 +26,11 @@ class TokenData(BaseModel):
     scopes: List[str] = []
 
 
+class User(BaseModel):
+    username: str
+    email: Optional[str] = None
+
+
 class Auth:
     def verify_password(plain_password, hashed_password):
         return pwd_context.verify(plain_password, hashed_password)
@@ -41,7 +46,7 @@ class Auth:
         user = await Auth.get_user(username)
         if not user:
             return False
-        if not Auth.verify_password(password, user.hashed_password):
+        if not Auth.verify_password(password, user["hashed_password"]):
             return False
         return user
 
@@ -85,3 +90,8 @@ class Auth:
                     headers={"WWW-Authenticate": authenticate_value},
                 )
         return user
+
+    async def get_current_active_user(current_user: User = Security(get_current_user, scopes=["me"])):
+        if current_user.disabled:
+            raise HTTPException(status_code=400, detail="Inactive user")
+        return current_user
