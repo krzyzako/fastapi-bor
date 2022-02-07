@@ -1,5 +1,4 @@
-from datetime import timedelta
-import datetime
+from datetime import timedelta, datetime
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import (
     OAuth2PasswordBearer,
@@ -12,23 +11,14 @@ from passlib.context import CryptContext
 from pydantic import BaseModel, ValidationError
 from app.models.users import UserModel
 from app.config.settings import get_settings
+from app.schemas.users import TokenData, User, UserLogin
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="api/auth/token",
+    tokenUrl="auth/login",
     scopes={"me": "Read information about the current user.", "items": "Read items."},
 )
 setting = get_settings()
-
-
-class TokenData(BaseModel):
-    username: Optional[str] = None
-    scopes: List[str] = []
-
-
-class User(BaseModel):
-    username: str
-    email: Optional[str] = None
 
 
 class Auth:
@@ -40,13 +30,13 @@ class Auth:
 
     async def get_user(username: str):
         user = await UserModel.objects.filter(username=username).get_or_none()
-        return user.dict()
+        return user
 
     async def authenticate_user(username: str, password: str):
         user = await Auth.get_user(username)
         if not user:
             return False
-        if not Auth.verify_password(password, user["hashed_password"]):
+        if not Auth.verify_password(password, user.hashed_password):
             return False
         return user
 
@@ -79,7 +69,7 @@ class Auth:
             token_data = TokenData(scopes=token_scopes, username=username)
         except (JWTError, ValidationError):
             raise credentials_exception
-        user = Auth.get_user(username=token_data.username)
+        user = await Auth.get_user(username=token_data.username)
         if user is None:
             raise credentials_exception
         for scope in security_scopes.scopes:
@@ -92,6 +82,6 @@ class Auth:
         return user
 
     async def get_current_active_user(current_user: User = Security(get_current_user, scopes=["me"])):
-        if current_user.disabled:
+        if not current_user.is_active:
             raise HTTPException(status_code=400, detail="Inactive user")
         return current_user
