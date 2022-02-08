@@ -9,8 +9,6 @@ on:
 jobs:
   build:
     runs-on: self-hosted
-    env:
-      USING_COVERAGE: "3.8"
 
     strategy:
       matrix:
