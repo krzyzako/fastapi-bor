@@ -17,4 +17,4 @@ jobs:
           python-version: "${{ matrix.python-version }}"
       - name: "Install dependencies"
         run: |
-          python -VV
+          python3 -VV
