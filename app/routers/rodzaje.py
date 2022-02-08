@@ -1,4 +1,3 @@
-from re import A
 from typing import List
 from unicodedata import name
 from fastapi import Depends, HTTPException, status, APIRouter
