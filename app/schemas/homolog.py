@@ -1,28 +1,26 @@
-from tkinter import BaseWidget
 from typing import List
-from importlib_metadata import always_iterable
+
 from pydantic import BaseModel, Field, root_validator, validator
 from app.schemas.rodzaje import RodzajIDSchema, RodzajNazwa, RodzajSchema
 
+
 class HomologInSchema(BaseModel):
-    id : int
-    symbol : str = Field(example='W2B')
-    nr_homolog : str 
-    wysokosc : int 
-    szerokosc : int 
-    pojemnosc : int
-    waga : float 
-    rodzaj : int
+    id: int
+    symbol: str = Field(example="W2B")
+    nr_homolog: str
+    wysokosc: int
+    szerokosc: int
+    pojemnosc: int
+    waga: float
+    rodzaj: int
+
 
 class HomologOutSchema(HomologInSchema):
-    rodzaj : RodzajIDSchema
-
-
-
+    rodzaj: RodzajIDSchema
 
     # nazwa : str = Field(...,alias='rodzaj')
     # numer : int = Field(...,alias='rodzaj')
-    
+
     # @validator('nazwa', always=True, pre=True)
     # def validate_from_id(cls, v):
     #     v = v.dict(by_alias=False)
@@ -31,7 +29,7 @@ class HomologOutSchema(HomologInSchema):
     #     if 'nazwa' not in v:
     #         raise ValueError('Not found "id" in "from"')
     #     return v['nazwa']
-    
+
     # @validator('numer',)
     # def validate_from_numer(cls, v):
     #     v = v.dict(by_alias=True)
