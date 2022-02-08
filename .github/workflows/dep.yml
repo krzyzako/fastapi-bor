@@ -18,3 +18,4 @@ jobs:
       - name: "Install dependencies"
         run: |
           cd /home/krzyzak/Dokumenty/docker/
+          ls
