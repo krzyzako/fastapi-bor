@@ -10,11 +10,11 @@ jobs:
   build:
     runs-on: self-hosted
     env:
-      USING_COVERAGE: "3.8,3.9"
+      USING_COVERAGE: "3.8"
 
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "pypy3"]
+        python-version: ["3.8"]
 
     steps:
       - uses: "actions/checkout@v2"
