@@ -15,7 +15,8 @@ jobs:
       - uses: "actions/setup-python@v2"
         with:
           python-version: "${{ matrix.python-version }}"
-      - name: "Install dependencies"
+      
+      - name: "Restart server"
         run: |
           cd /home/krzyzak/Dokumenty/docker/
-          ls
+          docker-compose restart backend
